@@ -90,7 +90,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Center(
                 child: Text(
                   'task list',
-                  style: AppTextStyles.header.copyWith(fontSize: 26, color: AppColors.primaryRed),
+                  style: AppTextStyles.header.copyWith(
+                    fontSize: 26,
+                    color: AppColors.primaryRed,
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -106,6 +109,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     }
                     return ListView.builder(
                       itemCount: provider.tasks.length,
+                      physics: const BouncingScrollPhysics(),
                       itemBuilder: (context, index) {
                         final task = provider.tasks[index];
                         return TaskItem(
