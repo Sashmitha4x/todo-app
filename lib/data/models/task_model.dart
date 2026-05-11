@@ -5,6 +5,7 @@ class TaskModel extends TaskEntity {
     required super.taskId,
     required super.title,
     super.isCompleted,
+    super.imageUrl,
     required super.createdAt,
   });
 
@@ -13,6 +14,7 @@ class TaskModel extends TaskEntity {
       taskId: json['taskId'],
       title: json['title'],
       isCompleted: json['isCompleted'] ?? false,
+      imageUrl: json['imageUrl'], 
       createdAt: json['createdAt'],
     );
   }
@@ -22,6 +24,7 @@ class TaskModel extends TaskEntity {
       'taskId': taskId,
       'title': title,
       'isCompleted': isCompleted,
+      'imageUrl': imageUrl, 
       'createdAt': createdAt,
     };
   }

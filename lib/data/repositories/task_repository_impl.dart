@@ -31,9 +31,21 @@ class TaskRepositoryImpl implements TaskRepository {
       remoteDataSource.updateTask(taskId, isCompleted);
 
   @override
-  Future<void> deleteTask(String taskId) => remoteDataSource.deleteTask(taskId);
+  Future<void> deleteTask(String taskId, {String? imageUrl}) =>
+      remoteDataSource.deleteTask(taskId, imageUrl: imageUrl);
 
   @override
-  Future<void> updateTaskTitle(String taskId, String newTitle) =>
-      remoteDataSource.updateTaskTitle(taskId, newTitle);
+  Future<void> updateTaskTitleAndImage(
+    String taskId,
+    String title, {
+    String? newImageUrl,
+    bool removeImage = false,
+    String? oldImageUrl,
+  }) => remoteDataSource.updateTaskTitleAndImage(
+    taskId,
+    title,
+    newImageUrl: newImageUrl,
+    removeImage: removeImage,
+    oldImageUrl: oldImageUrl,
+  );
 }
