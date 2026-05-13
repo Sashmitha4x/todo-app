@@ -15,12 +15,13 @@ class TaskRepositoryImpl implements TaskRepository {
     return List<TaskEntity>.from(taskModels);
   }
 
-  @override
+@override
   Future<TaskEntity> addTask(TaskEntity task) async {
     final taskModel = TaskModel(
       taskId: task.taskId,
       title: task.title,
       isCompleted: task.isCompleted,
+      imageUrl: task.imageUrl, 
       createdAt: task.createdAt,
     );
     return await remoteDataSource.createTask(taskModel);

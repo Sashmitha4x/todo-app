@@ -49,142 +49,193 @@ class TaskItem extends StatelessWidget {
             }
           }
 
-          return AlertDialog(
-            backgroundColor: AppColors.background,
-            title: const Text('Edit task', style: AppTextStyles.subHeaderRed),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: controller,
-                    style: AppTextStyles.bodyText,
-                    decoration: const InputDecoration(
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: AppColors.primaryGreen,
-                          width: 2,
-                        ),
-                      ),
-                    ),
-                    autofocus: true,
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Show the image preview (either the newly picked one, or the existing one)
-                  if (tempNewImageBytes != null)
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.memory(
-                        tempNewImageBytes!,
-                        height: 100,
-                        width: MediaQuery.of(
-                          context,
-                        ).size.width, // Fix applied here
-                        fit: BoxFit.cover,
-                      ),
-                    )
-                  else if (task.imageUrl != null && !tempRemoveImage)
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        task.imageUrl!,
-                        height: 100,
-                        width: MediaQuery.of(
-                          context,
-                        ).size.width, // Fix applied here
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-
-                  const SizedBox(height: 10),
-
-                  // Image action buttons
-                  Row(
-                    children: [
-                      TextButton.icon(
-                        icon: const Icon(
-                          Icons.image_outlined,
-                          color: AppColors.primaryGreen,
-                          size: 20,
-                        ),
-                        label: Text(
-                          task.imageUrl == null && tempNewImageBytes == null
-                              ? 'Add Image'
-                              : 'Change Image',
-                          style: const TextStyle(
-                            color: AppColors.primaryGreen,
-                            fontFamily: 'Gaegu',
-                          ),
-                        ),
-                        onPressed: pickNewImage,
-                      ),
-                      const Spacer(),
-                      // Only show remove button if there is an image to remove
-                      if ((task.imageUrl != null && !tempRemoveImage) ||
-                          tempNewImageBytes != null)
-                        TextButton.icon(
-                          icon: const Icon(
-                            Icons.delete_outline,
-                            color: Colors.red,
-                            size: 20,
-                          ),
-                          label: const Text(
-                            'Remove',
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontFamily: 'Gaegu',
-                            ),
-                          ),
-                          onPressed: () {
-                            setDialogState(() {
-                              tempNewImageBytes = null;
-                              tempRemoveImage = true;
-                            });
-                          },
-                        ),
-                    ],
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
                   ),
                 ],
               ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Edit task',
+                      style: AppTextStyles.header.copyWith(
+                        fontSize: 26,
+                        color: AppColors.primaryRed,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Upgraded Text Field (Soft background, no harsh borders)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: TextField(
+                        controller: controller,
+                        style: AppTextStyles.bodyText,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          isDense: true,
+                        ),
+                        autofocus: true,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Image Preview
+                    if (tempNewImageBytes != null)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Image.memory(
+                          tempNewImageBytes!,
+                          height: 120,
+                          width: MediaQuery.of(context).size.width,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    else if (task.imageUrl != null && !tempRemoveImage)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Image.network(
+                          task.imageUrl!,
+                          height: 120,
+                          width: MediaQuery.of(context).size.width,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+
+                    const SizedBox(height: 16),
+
+                    // Image Action Buttons
+                    Row(
+                      children: [
+                        TextButton.icon(
+                          icon: const Icon(
+                            Icons.image_outlined,
+                            color: AppColors.primaryGreen,
+                            size: 20,
+                          ),
+                          label: Text(
+                            task.imageUrl == null && tempNewImageBytes == null
+                                ? 'Add Image'
+                                : 'Change Image',
+                            style: const TextStyle(
+                              color: AppColors.primaryGreen,
+                              fontFamily: 'Gaegu',
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          onPressed: pickNewImage,
+                        ),
+                        const Spacer(),
+                        if ((task.imageUrl != null && !tempRemoveImage) ||
+                            tempNewImageBytes != null)
+                          TextButton.icon(
+                            icon: const Icon(
+                              Icons.delete_outline,
+                              color: Colors.red,
+                              size: 20,
+                            ),
+                            label: const Text(
+                              'Remove',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontFamily: 'Gaegu',
+                                fontSize: 16,
+                              ),
+                            ),
+                            onPressed: () {
+                              setDialogState(() {
+                                tempNewImageBytes = null;
+                                tempRemoveImage = true;
+                              });
+                            },
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Save and Cancel Buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
+                          ),
+                          child: const Text(
+                            'Cancel',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontFamily: 'Gaegu',
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () {
+                            if (controller.text.trim().isNotEmpty) {
+                              context.read<TaskProvider>().editTask(
+                                task.taskId,
+                                controller.text.trim(),
+                                newImageBytes: tempNewImageBytes,
+                                removeImage: tempRemoveImage,
+                              );
+                            }
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryGreen,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: const Text(
+                            'Save',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'Gaegu',
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text(
-                  'Cancel',
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 94, 93, 93),
-                    fontFamily: 'Gaegu',
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  if (controller.text.trim().isNotEmpty) {
-                    // Replaced updateTaskTitle with the new editTask method
-                    context.read<TaskProvider>().editTask(
-                      task.taskId,
-                      controller.text.trim(),
-                      newImageBytes: tempNewImageBytes,
-                      removeImage: tempRemoveImage,
-                    );
-                  }
-                  Navigator.pop(context);
-                },
-                child: const Text(
-                  'Save',
-                  style: TextStyle(
-                    color: AppColors.primaryGreen,
-                    fontFamily: 'Gaegu',
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
           );
         },
       ),
@@ -193,22 +244,31 @@ class TaskItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16.0), // Space between cards
+      padding: const EdgeInsets.all(16.0), // Inner padding
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment
-            .start, // Aligns checkbox to the top if there is an image
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(
-              top: 4.0,
-            ), // Keeps checkbox centered with the first line of text
+            padding: const EdgeInsets.only(top: 2.0),
             child: CustomCheckbox(
               value: task.isCompleted,
               onChanged: (_) => onToggle(),
             ),
           ),
-          const SizedBox(width: 50),
+          const SizedBox(width: 16), // Adjusted width for better proportion
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,40 +277,35 @@ class TaskItem extends StatelessWidget {
                   task.title,
                   style: AppTextStyles.header.copyWith(
                     fontSize: 22,
-                    // 1. Dim the text color when completed
                     color: task.isCompleted
-                        ? Colors.grey.shade500
+                        ? Colors.grey.shade400
                         : AppColors.textPrimary,
-
-                    // 2. Apply the strikethrough
                     decoration: task.isCompleted
                         ? TextDecoration.lineThrough
                         : TextDecoration.none,
-
-                    // 3. Ensure the line itself matches the dim text color
                     decorationColor: task.isCompleted
-                        ? Colors.grey.shade500
+                        ? Colors.grey.shade400
                         : Colors.transparent,
-
-                    // 4. Slightly thicken the line so it cuts through the font cleanly
-                    decorationThickness: 1.0,
+                    decorationThickness: 1.5,
                   ),
                 ),
-                // Show the uploaded image if the task has one
                 if (task.imageUrl != null)
                   Padding(
-                    padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
+                    padding: const EdgeInsets.only(top: 12.0),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.network(
                         task.imageUrl!,
-                        height: 140,
+                        height: 160,
                         width: double.infinity,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
-                          height: 140,
+                          height: 160,
                           width: double.infinity,
-                          color: Colors.grey.shade200,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                           child: const Icon(
                             Icons.broken_image,
                             color: Colors.grey,
@@ -262,20 +317,44 @@ class TaskItem extends StatelessWidget {
               ],
             ),
           ),
-          // Only show edit button if task is NOT completed
+          const SizedBox(width: 8),
+
+          // Action Buttons
           if (!task.isCompleted)
-            IconButton(
-              icon: const Icon(
-                Icons.edit_outlined,
-                color: AppColors.primaryGreen,
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(10),
               ),
-              onPressed: () => _showEditDialog(context),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.edit_outlined,
+                  color: AppColors.primaryGreen,
+                  size: 22,
+                ),
+                constraints: const BoxConstraints(),
+                padding: const EdgeInsets.all(8),
+                onPressed: () => _showEditDialog(
+                  context,
+                ), // Ensure your dialog code is pasted above
+              ),
             ),
-          // Show delete button if task IS completed
           if (task.isCompleted)
-            IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.red),
-              onPressed: onDelete,
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.delete_outline,
+                  color: Colors.red,
+                  size: 22,
+                ),
+                constraints: const BoxConstraints(),
+                padding: const EdgeInsets.all(8),
+                onPressed: onDelete,
+              ),
             ),
         ],
       ),

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -34,18 +35,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _submitTask() async {
     if (_taskController.text.trim().isNotEmpty) {
-      // Pass the image bytes to the provider
       await context.read<TaskProvider>().addTask(
-            _taskController.text,
-            imageBytes: _selectedImageBytes,
-          );
+        _taskController.text,
+        imageBytes: _selectedImageBytes,
+      );
       _taskController.clear();
-      setState(() => _selectedImageBytes = null); // Clear image preview
+      setState(() => _selectedImageBytes = null);
       FocusScope.of(context).unfocus();
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Task cannot be empty')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            'Task cannot be empty',
+            style: TextStyle(fontFamily: 'Gaegu', fontSize: 18),
+          ),
+          backgroundColor: AppColors.primaryRed,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
     }
   }
 
@@ -55,7 +65,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(AppSizes.paddingLarge),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.paddingLarge,
+            vertical: 10,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -66,100 +79,121 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   style: AppTextStyles.header,
                 ),
               ),
-              const SizedBox(height: 80),
-              // Wrapped the Row in a Column to stack the image preview below it
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _taskController,
-                          style: AppTextStyles.bodyText,
-                          decoration: InputDecoration(
-                            hintText: 'add new task',
-                            hintStyle:
-                                AppTextStyles.header.copyWith(fontSize: 26),
-                            enabledBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: AppColors.primaryGreen,
-                                width: 3.5,
-                              ),
-                            ),
-                            focusedBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Color.fromARGB(255, 50, 184, 83),
-                                width: 4,
-                              ),
-                            ),
-                            isDense: true,
-                            contentPadding: const EdgeInsets.only(bottom: 12),
-                          ),
-                          onSubmitted: (_) => _submitTask(),
-                        ),
-                      ),
-                      const SizedBox(width: AppSizes.paddingSmall),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.image_outlined,
-                          color: Colors.grey,
-                          size: 28,
-                        ),
-                        onPressed: _pickImage,
-                      ),
-                      IconButton(
-                        icon: SvgPicture.asset(
-                          'assets/icons/add.svg',
-                          width: 20,
-                          height: 20,
-                        ),
-                        onPressed: _submitTask,
-                      ),
-                    ],
-                  ),
-                  // Image Preview before uploading
-                  if (_selectedImageBytes != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 12.0),
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.memory(
-                              _selectedImageBytes!,
-                              height: 60,
-                              width: 60,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Positioned(
-                            right: -10,
-                            top: -10,
-                            child: GestureDetector(
-                              onTap: () =>
-                                  setState(() => _selectedImageBytes = null),
-                              child: Container(
-                                decoration: const BoxDecoration(
-                                  color: AppColors.background,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.cancel,
-                                  color: AppColors.primaryRed,
-                                  size: 22,
-                                ),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
+              const SizedBox(height: 40),
+
+              // UPGRADED INPUT AREA: Soft floating card
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
                     ),
-                ],
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _taskController,
+                            style: AppTextStyles.bodyText,
+                            decoration: InputDecoration(
+                              hintText: 'add new task...',
+                              hintStyle: AppTextStyles.header.copyWith(
+                                fontSize: 24,
+                                color: Colors.grey.shade400,
+                              ),
+                              border:
+                                  InputBorder.none, // Removed harsh underline
+                              isDense: true,
+                            ),
+                            onSubmitted: (_) => _submitTask(),
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.image_outlined,
+                              color: Colors.grey,
+                              size: 26,
+                            ),
+                            onPressed: _pickImage,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryGreen.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: IconButton(
+                            icon: SvgPicture.asset(
+                              'assets/icons/add.svg',
+                              width: 20,
+                              height: 20,
+                            ),
+                            onPressed: _submitTask,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // Image Preview
+                    if (_selectedImageBytes != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16.0),
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.memory(
+                                _selectedImageBytes!,
+                                height: 70,
+                                width: 70,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Positioned(
+                              right: -8,
+                              top: -8,
+                              child: GestureDetector(
+                                onTap: () =>
+                                    setState(() => _selectedImageBytes = null),
+                                child: Container(
+                                  padding: const EdgeInsets.all(2),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.cancel,
+                                    color: AppColors.primaryRed,
+                                    size: 24,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 50),
+
+              const SizedBox(height: 40),
               Center(
                 child: Text(
                   'task list',
@@ -169,7 +203,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
+
               Expanded(
                 child: Consumer<TaskProvider>(
                   builder: (context, provider, child) {
@@ -180,19 +215,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       );
                     }
+
+                    // UPGRADED EMPTY STATE
+                    if (provider.tasks.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.task_alt,
+                              size: 60,
+                              color: Colors.grey.shade300,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              "All caught up!",
+                              style: AppTextStyles.header.copyWith(
+                                color: Colors.grey.shade400,
+                                fontSize: 24,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
                     return ListView.builder(
                       itemCount: provider.tasks.length,
                       physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.only(bottom: 20, top: 8),
                       itemBuilder: (context, index) {
                         final task = provider.tasks[index];
                         return TaskItem(
-                          task: task,
-                          onToggle: () => provider.toggleTaskStatus(
-                            task.taskId,
-                            task.isCompleted,
-                          ),
-                          onDelete: () => provider.deleteTask(task.taskId),
-                        );
+                              task: task,
+                              onToggle: () => provider.toggleTaskStatus(
+                                task.taskId,
+                                task.isCompleted,
+                              ),
+                              onDelete: () => provider.deleteTask(task.taskId),
+                            )
+                            // THIS IS THE NEW ANIMATION MAGIC
+                            .animate()
+                            .fade(duration: 300.ms)
+                            .slideY(
+                              begin: 0.2,
+                              end: 0,
+                              duration: 300.ms,
+                              curve: Curves.easeOutQuad,
+                            );
                       },
                     );
                   },
